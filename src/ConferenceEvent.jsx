@@ -33,14 +33,13 @@ const ConferenceEvent = () => {
         }
       };
     const handleIncrementAvQuantity = (index) => {
-      if (avItems[index]) {
-        dispatch(incrementAvQuantity);
-      }
+      if (avItems[index]){
+        dispatch(incrementAvQuantity(index));}
     };
 
     const handleDecrementAvQuantity = (index) => {
       if(avItems[index] && avItems[index].quantity > 0) {
-        dispatch(decrementAvQuantity);
+        dispatch(decrementAvQuantity(index));
       }
     };
 
