@@ -4,29 +4,31 @@ import TotalCost from "./TotalCost";
 import { useSelector, useDispatch } from "react-redux";
 import { incrementQuantity, decrementQuantity } from "./venueSlice";
 import { incrementAvQuantity, decrementAvQuantity } from "./avSlice";
-import { toggleMealSelection} from "./mealsSlice";
+import { toggleMealSelection } from "./mealsSlice";
+import { BUSINESS_RULES } from "./config/constants";
+
 const ConferenceEvent = () => {
     const [showItems, setShowItems] = useState(false);
-    const [numberOfPeople, setNumberOfPeople] = useState(1);
+    const [numberOfPeople, setNumberOfPeople] = useState(BUSINESS_RULES.minPeople);
     const venueItems = useSelector((state) => state.venue);
     const avItems = useSelector((state) => state.av);
     const mealsItems = useSelector((state) => state.meals);
     const dispatch = useDispatch();
-    const remainingAuditoriumQuantity = 3 - venueItems.find(item => item.name === "Auditorium Hall (Capacity:200)").quantity;
+    const remainingAuditoriumQuantity = BUSINESS_RULES.maxAuditoriumQty - venueItems.find(item => item.name === "Auditorium Hall (Capacity:200)").quantity;
 
-    
+
     const handleToggleItems = () => {
         console.log("handleToggleItems called");
         setShowItems(!showItems);
     };
 
     const handleAddToCart = (index) => {
-        if (venueItems[index].name === "Auditorium Hall (Capacity:200)" && venueItems[index].quantity >= 3) {
-          return; 
+        if (venueItems[index].name === "Auditorium Hall (Capacity:200)" && venueItems[index].quantity >= BUSINESS_RULES.maxAuditoriumQty) {
+          return;
         }
         dispatch(incrementQuantity(index));
       };
-    
+
       const handleRemoveFromCart = (index) => {
         if (venueItems[index].quantity > 0) {
           dispatch(decrementQuantity(index));
@@ -79,7 +81,7 @@ const ConferenceEvent = () => {
     };
 
     const items = getItemsFromTotalCost();
-      
+
 
     const ItemsDisplay = ({ items }) => {
       console.log(items);
@@ -102,7 +104,7 @@ const ConferenceEvent = () => {
                 <td>${item.cost}</td>
                 <td>
                   {item.type === "meals" || item.numberOfPeople
-                  ? `For ${numberOfPeople} people` : item.quantity} 
+                  ? `For ${numberOfPeople} people` : item.quantity}
                 </td>
                 <td>
                   {item.type === "meals" || item.numberOfPeople
@@ -141,12 +143,12 @@ const ConferenceEvent = () => {
 
     const navigateToProducts = (idType) => {
         if (idType == '#venue' || idType == '#addons' || idType == '#meals') {
-          if (showItems) { // Check if showItems is false
-            setShowItems(!showItems); // Toggle showItems to true only if it's currently false
+          if (showItems) {
+            setShowItems(!showItems);
           }
         }
       }
-    
+
     const totalCosts = {
       venue: venueTotalCost,
       av: avTotalCost,
@@ -175,7 +177,7 @@ const ConferenceEvent = () => {
                         <div className="items-information">
                              <div id="venue" className="venue_container container_main">
         <div className="text">
- 
+
           <h1>Venue Room Selection</h1>
         </div>
         <div className="venue_selection">
@@ -218,13 +220,13 @@ const ConferenceEvent = () => {
               {venueItems[index].quantity > 0 ? ` ${venueItems[index].quantity}` : "0"}
             </span>
             <button
-              className={venueItems[index].quantity === 10 ? " btn-success btn-disabled" : "btn-success btn-plus"}
+              className={venueItems[index].quantity === BUSINESS_RULES.maxVenueQty ? " btn-success btn-disabled" : "btn-success btn-plus"}
               onClick={() => handleAddToCart(index)}
             >
              &#43;
             </button>
-            
-            
+
+
           </div>
         )}
       </div>
@@ -276,7 +278,7 @@ const ConferenceEvent = () => {
                                 <div className="input-container venue_selection">
                                   <label htmlFor="numberOfPeople"><h3>Number of People:</h3></label>
                                   <input type="number" className="input_box5" id="numberOfPeople" value={numberOfPeople}
-                                  onChange={(e) => setNumberOfPeople(parseInt(e.target.value))} min="1"/>
+                                  onChange={(e) => setNumberOfPeople(parseInt(e.target.value))} min={BUSINESS_RULES.minPeople}/>
 
                                 </div>
                                 <div className="meal_selection">
